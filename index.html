@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guitars Over Guns - Prototype</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <style>
+        :root {
+            --bg-color: #f9f9f9;
+            --text-color: #1a1a1a;
+            --primary-accent: #ff4500; /* Vibrant Orange */
+            --key-white: #ffffff;
+            --key-black: #1a1a1a;
+            --key-shadow: rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+        }
+
+        /* Subtle Grain Texture */
+        .grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 150;
+            color: var(--text-color);
+            opacity: 0;
+            mix-blend-mode: color-burn;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            font-weight: 600;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .headline-container {
+            position: absolute;
+            top: 20%;
+            text-align: center;
+            z-index: 10;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 7vw, 7rem);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            color: var(--text-color);
+            opacity: 0;
+            transform: translateY(30px);
+            text-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        /* Hero Content Details */
+        .hero-details {
+            position: absolute;
+            bottom: 55vh;
+            text-align: center;
+            z-index: 10;
+            width: 100%;
+            max-width: 600px;
+            opacity: 0;
+        }
+
+        .subheadline {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+            font-weight: 400;
+            color: #444;
+        }
+
+        .cta-button {
+            padding: 1rem 3rem;
+            background-color: var(--primary-accent);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-family: inherit;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 69, 0, 0.4);
+        }
+
+        /* Piano Keyboard */
+        .piano-wrapper {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 45vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding: 0 4vw;
+            z-index: 50;
+        }
+
+        .keyboard {
+            display: flex;
+            position: relative;
+            height: 100%;
+            width: 100%;
+            max-width: 1600px;
+            perspective: 1200px; /* 3D effect for pressing */
+        }
+
+        .key-white {
+            flex: 1;
+            height: 100%;
+            background: var(--key-white);
+            border: 1px solid #d4d4d4;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 
+                inset 0 -15px 15px rgba(0,0,0,0.03),
+                0 10px 20px var(--key-shadow);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 3rem;
+            transform-origin: top center;
+            cursor: pointer;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        
+        .key-black {
+            position: absolute;
+            top: 0;
+            /* width needs absolute calculation: roughly 60% of a white key */
+            height: 60%;
+            background: linear-gradient(to bottom, #444, #111);
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+            z-index: 2;
+            transform-origin: top center;
+            box-shadow: 3px 5px 8px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+        
+        /* Interactive Highlight */
+        .key-white:hover {
+            background: #fffafa;
+            box-shadow: 0 8px 30px rgba(255, 69, 0, 0.15);
+        }
+
+        .key-white.active {
+            background: #ffebe5;
+        }
+
+        .key-black:hover {
+            background: linear-gradient(to bottom, #555, #222);
+        }
+
+        .key-black.active {
+            background: #000;
+        }
+
+        .key-word {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--primary-accent);
+            opacity: 0;
+            transform: scale(0.5);
+            pointer-events: none;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            /* Vertical text */
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+        }
+
+        @media (min-width: 768px) {
+            .key-word {
+                writing-mode: horizontal-tb;
+                transform: none;
+                font-size: 1.25rem;
+            }
+        }
+
+        /* Scroll details wrapper */
+        .content-section {
+            padding: 10rem 2rem;
+            text-align: center;
+            min-height: 100vh;
+            background: #111;
+            color: white;
+            position: relative;
+            z-index: 200;
+        }
+        
+        .content-section h2 {
+            font-size: clamp(2.5rem, 5vw, 5rem);
+            margin-bottom: 2rem;
+        }
+
+        /* Loading Screen */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-color);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-accent);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="grain"></div>
+    
+    <div class="loader">
+        <span id="loading-text">Tuning...</span>
+    </div>
+
+    <nav>
+        <div class="logo">GOG</div>
+        <ul class="nav-links">
+            <li>Programs</li>
+            <li>Impact</li>
+            <li>Donate</li>
+        </ul>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="headline-container">
+                <h1 class="headline">Choose Your Sound</h1>
+            </div>
+            
+            <div class="hero-details">
+                <p class="subheadline">Music mentorship programs transforming lives across Miami, Chicago, LA, and NYC</p>
+                <button class="cta-button">Discover Our Programs</button>
+            </div>
+
+            <div class="piano-wrapper">
+                <div class="keyboard" id="keyboard">
+                    <!-- Keys injected via JS -->
+                </div>
+            </div>
+        </section>
+        
+        <section class="content-section">
+            <div class="content-wrapper">
+                <h2>Our Impact</h2>
+                <p style="max-width: 600px; margin: 0 auto; font-size: 1.5rem; line-height: 1.6; color: #ccc;">
+                    Providing youth with a safe space, a mentor, and a microphone to find their voice and direct their future.
+                </p>
+                
+                <div style="margin-top: 5rem; display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;">
+                    <div style="padding: 2.5rem; background: #222; border-radius: 12px; width: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                        <h3 style="font-size: 3.5rem; color: var(--primary-accent);">4,500+</h3>
+                        <p style="color: #aaa; margin-top: 0.5rem; font-weight: 600; text-transform: uppercase;">Students Reached</p>
+                    </div>
+                     <div style="padding: 2.5rem; background: #222; border-radius: 12px; width: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                        <h3 style="font-size: 3.5rem; color: var(--primary-accent);">15+</h3>
+                        <p style="color: #aaa; margin-top: 0.5rem; font-weight: 600; text-transform: uppercase;">Years of Mentoring</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- GSAP CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Core Configuration
+        const tagline = ["Empowering", "Youth", "Through", "Music", "&", "Mentorship"];
+        const keyboard = document.getElementById('keyboard');
+        const totalWhiteKeys = 14; 
+        
+        // C Major scale pattern for black keys (W-W-H-W-W-W-H)
+        const hasBlackKeyAfter = [true, true, false, true, true, true, false, true, true, false, true, true, true, false];
+        
+        const keysArray = [];
+        let wordIndex = 0;
+
+        // 1. DOM Setup for Piano Keys
+        for (let i = 0; i < totalWhiteKeys; i++) {
+            // White Key Construction
+            const whiteKey = document.createElement('div');
+            whiteKey.className = 'key-white';
+            whiteKey.setAttribute('aria-label', `Piano key ${i+1}`);
+            whiteKey.setAttribute('role', 'button');
+            whiteKey.setAttribute('tabindex', '0');
+            
+            // Distribute 6 tagline words evenly across 14 keys
+            let wordSpan = null;
+            if (i % 2 !== 0 && wordIndex < tagline.length) {
+                wordSpan = document.createElement('span');
+                wordSpan.className = 'key-word';
+                wordSpan.textContent = tagline[wordIndex];
+                whiteKey.appendChild(wordSpan);
+                wordIndex++;
+            }
+
+            keyboard.appendChild(whiteKey);
+            keysArray.push({ el: whiteKey, type: 'white', wordEl: wordSpan, index: i });
+
+            // Black Key Construction
+            if (hasBlackKeyAfter[i] && i < totalWhiteKeys - 1) {
+                const blackKey = document.createElement('div');
+                blackKey.className = 'key-black';
+                
+                // Position logic based on percentage of container
+                const wWidth = 100 / totalWhiteKeys;
+                blackKey.style.width = `calc(${wWidth} * 0.6%)`;
+                blackKey.style.left = `calc(${wWidth * (i + 1)}% - (${wWidth} * 0.3%))`;
+                
+                keyboard.appendChild(blackKey);
+                keysArray.push({ el: blackKey, type: 'black', index: i + 0.5 });
+            }
+        }
+
+        // Sort keys logically from left to right for stagger effects
+        keysArray.sort((a,b) => a.index - b.index);
+
+        // 2. Audio Setup - Subtle Sine Waves
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let ctx = null;
+
+        function playNote(frequency) {
+            if(!ctx) {
+                ctx = new AudioContext();
+            }
+            if(ctx.state === 'suspended') ctx.resume();
+            
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+            
+            gain.gain.setValueAtTime(0, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05); // Play subtle note
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+            
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            
+            osc.start();
+            osc.stop(ctx.currentTime + 1.5);
+        }
+
+        const baseFreq = 130.81; // C3
+        
+        // 3. Interactions for Keys (Hover & Click)
+        keysArray.forEach((keyData, index) => {
+            const freq = baseFreq * Math.pow(2, index / 12); // Equal temperament
+            
+            // Mouse Enter
+            keyData.el.addEventListener('mouseenter', () => {
+                gsap.to(keyData.el, {
+                    rotationX: -2,
+                    duration: 0.2,
+                    ease: "power1.out"
+                });
+            });
+
+            // Mouse Leave
+            keyData.el.addEventListener('mouseleave', () => {
+                if(!keyData.el.classList.contains('active')){
+                    gsap.to(keyData.el, {
+                        rotationX: 0,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                }
+            });
+
+            // Mouse Down (Press)
+            keyData.el.addEventListener('mousedown', () => {
+                keyData.el.classList.add('active');
+                playNote(freq);
+                
+                gsap.to(keyData.el, {
+                    rotationX: -6, // Push down into 3D space
+                    transformOrigin: "top center",
+                    duration: 0.1
+                });
+                
+                if(keyData.wordEl) {
+                    gsap.to(keyData.wordEl, { scale: 1.1, duration: 0.1 });
+                }
+            });
+
+            // Mouse Up (Release)
+            keyData.el.addEventListener('mouseup', () => {
+                keyData.el.classList.remove('active');
+                gsap.to(keyData.el, {
+                    rotationX: 0,
+                    duration: 0.5,
+                    ease: "elastic.out(1, 0.4)"
+                });
+                
+                if(keyData.wordEl) {
+                    gsap.to(keyData.wordEl, { scale: 1, duration: 0.3 });
+                }
+            });
+
+            // Keyboard Accessibility
+            keyData.el.addEventListener('keydown', (e) => {
+                if(e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    keyData.el.dispatchEvent(new Event('mousedown'));
+                }
+            });
+            keyData.el.addEventListener('keyup', (e) => {
+                if(e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    keyData.el.dispatchEvent(new Event('mouseup'));
+                }
+            });
+        });
+
+        // 4. Main Timeline Animation
+        window.addEventListener('load', () => {
+            const tl = gsap.timeline();
+
+            // Hide Loader
+            tl.to('.loader', {
+                opacity: 0,
+                duration: 0.6,
+                ease: "power2.inOut",
+                onComplete: () => document.querySelector('.loader').style.display = 'none'
+            });
+
+            const allKeyEls = keysArray.map(k => k.el);
+            const wordEls = keysArray.filter(k => k.wordEl).map(k => k.wordEl);
+
+            // Stagger Key Press (Cascading from left to right)
+            tl.to(allKeyEls, {
+                rotationX: -8,
+                transformOrigin: "top center",
+                duration: 0.3,
+                stagger: {
+                    each: 0.05,
+                    from: "start"
+                },
+                ease: "power1.inOut"
+            }, "-=0.2");
+
+            // Words appear as keys are pressed
+            tl.to(wordEls, {
+                opacity: 1,
+                scale: 1,
+                duration: 0.4,
+                stagger: {
+                    each: 0.05 * (keysArray.length / wordEls.length), // sync with keys
+                    from: "start"
+                },
+                ease: "back.out(1.5)"
+            }, "<0.1");
+
+            // Pause slightly
+            tl.to({}, { duration: 0.5 });
+            
+            // Release all keys
+            tl.to(allKeyEls, {
+                rotationX: 0,
+                duration: 0.8,
+                stagger: {
+                    each: 0.02,
+                    from: "end"
+                },
+                ease: "elastic.out(1, 0.3)"
+            });
+
+            // Reveal Headline
+            tl.to('.headline', {
+                opacity: 1,
+                y: 0,
+                duration: 1.2,
+                ease: "power4.out"
+            }, "-=0.8");
+
+            // Reveal Subheadline and CTA
+            tl.to('.hero-details', {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: "power3.out"
+            }, "-=0.9");
+
+            // Reveal Navigation
+            tl.to('nav', {
+                opacity: 1,
+                duration: 0.8
+            }, "-=0.6");
+        });
+
+        // 5. ScrollTrigger Animations
+        // Pin keyboard and parallax elements
+        gsap.to('.piano-wrapper', {
+            scrollTrigger: {
+                trigger: '.hero',
+                start: "top top",
+                end: "bottom top",
+                scrub: true,
+                pin: true,
+                pinSpacing: false
+            },
+            y: 100, // moves down slightly
+            opacity: 0.2, // fades out
+            scale: 0.95
+        });
+
+        // Headline parallax upwards
+        gsap.to('.headline-container', {
+            scrollTrigger: {
+                trigger: '.hero',
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            },
+            y: -200,
+            opacity: 0
+        });
+
+        // CTA details fade quick
+        gsap.to('.hero-details', {
+            scrollTrigger: {
+                trigger: '.hero',
+                start: "top top",
+                end: "top -50%",
+                scrub: true
+            },
+            y: -50,
+            opacity: 0
+        });
+
+        // Next section elements reveal smoothly
+        gsap.from('.content-wrapper h2, .content-wrapper p, .content-wrapper div', {
+            scrollTrigger: {
+                trigger: '.content-section',
+                start: "top 80%"
+            },
+            y: 60,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.2,
+            ease: "power3.out"
+        });
+
+    </script>
+</body>
+</html>
