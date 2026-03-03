@@ -240,21 +240,6 @@
             }
         }
 
-        /* Scroll details wrapper */
-        .content-section {
-            padding: 10rem 2rem;
-            text-align: center;
-            min-height: 100vh;
-            background: #111;
-            color: white;
-            position: relative;
-            z-index: 200;
-        }
-        
-        .content-section h2 {
-            font-size: clamp(2.5rem, 5vw, 5rem);
-            margin-bottom: 2rem;
-        }
 
         /* Loading Screen */
         .loader {
@@ -305,26 +290,6 @@
             <div class="piano-wrapper">
                 <div class="keyboard" id="keyboard">
                     <!-- Keys injected via JS -->
-                </div>
-            </div>
-        </section>
-        
-        <section class="content-section">
-            <div class="content-wrapper">
-                <h2>Our Impact</h2>
-                <p style="max-width: 600px; margin: 0 auto; font-size: 1.5rem; line-height: 1.6; color: #ccc;">
-                    Providing youth with a safe space, a mentor, and a microphone to find their voice and direct their future.
-                </p>
-                
-                <div style="margin-top: 5rem; display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;">
-                    <div style="padding: 2.5rem; background: #222; border-radius: 12px; width: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                        <h3 style="font-size: 3.5rem; color: var(--primary-accent);">4,500+</h3>
-                        <p style="color: #aaa; margin-top: 0.5rem; font-weight: 600; text-transform: uppercase;">Students Reached</p>
-                    </div>
-                     <div style="padding: 2.5rem; background: #222; border-radius: 12px; width: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                        <h3 style="font-size: 3.5rem; color: var(--primary-accent);">15+</h3>
-                        <p style="color: #aaa; margin-top: 0.5rem; font-weight: 600; text-transform: uppercase;">Years of Mentoring</p>
-                    </div>
                 </div>
             </div>
         </section>
@@ -602,18 +567,6 @@
             opacity: 0
         });
 
-        // Next section elements reveal smoothly
-        gsap.from('.content-wrapper h2, .content-wrapper p, .content-wrapper div', {
-            scrollTrigger: {
-                trigger: '.content-section',
-                start: "top 80%"
-            },
-            y: 60,
-            opacity: 0,
-            duration: 1,
-            stagger: 0.2,
-            ease: "power3.out"
-        });
 
     </script>
 </body>
